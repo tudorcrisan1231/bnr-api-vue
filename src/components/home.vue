@@ -55,7 +55,6 @@ export default {
     let search = '';
     async function getApiData() {
    
-
       //in caz ca nu exista in localstorage se face request la api si se salveaza in localstorage, altfel se ia din localstorage
       if(localStorage.getItem(current_data) == null || localStorage.getItem(current_data) == 'null'){
       
@@ -89,7 +88,7 @@ export default {
             location.reload();
           } else {
             localStorage.setItem(current_data, null);
-            location.reload();
+            // location.reload();
           }
           console.log('api called');
         })
