@@ -189,7 +189,10 @@
         },
 
         savePreference(){
+            //remove duplicates from this.selected_currencies
+            this.selected_currencies = [...new Set(this.selected_currencies)];
             localStorage.setItem('prefered_currencies', JSON.stringify(this.selected_currencies));
+
             //refresh page
             location.reload();
         },
