@@ -6,11 +6,15 @@
             :data="chartData"
         />
         <div class="page_select">
-            <div class="page_select_title">Select which currency you like</div>
+            <div class="page_select_title">Filters:</div>
             <select name="" id="" multiple v-model="selected_currencies" class="page_preference">
                 <option v-for="(item, index) in this.getCurrenciesValues()" :key="index" v-bind:value="item">{{ item }}</option>
             </select>
-            <div @click="savePreference()" class="page_save">Save preferences</div>
+            <div class="page_select_btns">
+                <div @click="savePreference()" class="page_save">Save preferences</div>
+                <div @click="resetPreference()" class="page_save" style="background-color: brown;">RESET preferences</div>
+            </div>
+            
         </div>
 
     </div>
@@ -116,15 +120,14 @@
                 for(let i = 0; i < rates[0].length; i++){
                     if(selected_currencies_fromLS){
                         if(selected_currencies_fromLS.includes(rates[0][i].attributes.currency.value)){
-                        this.selected_currencies.push(rates[0][i].attributes.currency.value);
+                            this.selected_currencies.push(rates[0][i].attributes.currency.value);
                         }
-                    } else {
-                    this.selected_currencies.push(rates[0][i].attributes.currency.value);
+                    }
+                    else {
+                        this.selected_currencies.push(rates[0][i].attributes.currency.value);
                     }
                 }
             }
-
-
             
             return currencies;
         },
@@ -139,8 +142,10 @@
             if(selected_currencies){
                 for(let i = 0; i < rates[0].length; i++){
                     if(selected_currencies){
-                        if(selected_currencies.includes(rates[0][i].attributes.currency.value)){
-                            currencies.push(rates[0][i].attributes.currency.value);
+                        for(let j = 0; j < selected_currencies.length; j++){
+                            if(selected_currencies[j] == rates[0][i].attributes.currency.value){
+                                currencies.push(rates[0][i].attributes.currency.value);
+                            }
                         }
                     } else {
                         currencies.push(rates[0][i].attributes.currency.value);
@@ -154,13 +159,21 @@
             }
 
 
+            //aici formez datele pt chart in functie de valutele selectate de user si le pun in datasets sub formatul {data: [1,2,3], label: 'RON'} pt ca asa vrea chart.js
             for(let i = 0; i<currencies.length; i++){
                 let data = [];
                 for(let j = 0; j < rates.length; j++){
-                    data.push(parseFloat(rates[j][i].innerHTML));
+                    
+                    for(let k = 0; k < rates[j].length; k++){
+                        if(rates[j][k].attributes.currency.value == currencies[i]){
+                            data.push(parseFloat(rates[j][k].innerHTML));
+                        }
+                    }
+
                 }
                 datasets.push({data: data, label: currencies[i]});
             }
+
             return datasets;
         },
 
@@ -177,11 +190,15 @@
 
         savePreference(){
             localStorage.setItem('prefered_currencies', JSON.stringify(this.selected_currencies));
+            //refresh page
+            location.reload();
+        },
 
+        resetPreference(){
+            localStorage.removeItem('prefered_currencies');
             //refresh page
             location.reload();
         }
-
 
     },
 
